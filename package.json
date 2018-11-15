@@ -1,0 +1,25 @@
+{
+  "name": "turtlepay-wallet",
+  "version": "0.0.1",
+  "description": "TurtlePay: TurtleCoin Wallet Service (TWS)",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TurtlePay/turtlepay-wallet.git"
+  },
+  "keywords": [
+    "TurtlePay"
+  ],
+  "author": "TurtlePay Development Team",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/TurtlePay/turtlepay-wallet/issues"
+  },
+  "homepage": "https://github.com/TurtlePay/turtlepay-wallet#readme",
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}
