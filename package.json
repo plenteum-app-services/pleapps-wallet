@@ -21,5 +21,8 @@
   "homepage": "https://github.com/TurtlePay/turtlepay-wallet#readme",
   "devDependencies": {
     "standard": "^12.0.1"
+  },
+  "dependencies": {
+    "turtlecoin-utils": "git+https://github.com/turtlecoin/turtlecoin-utils.git"
   }
 }
