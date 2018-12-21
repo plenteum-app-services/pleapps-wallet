@@ -23,6 +23,9 @@
     "standard": "^12.0.1"
   },
   "dependencies": {
+    "amqplib": "^0.5.3",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5",
     "turtlecoin-utils": "git+https://github.com/turtlecoin/turtlecoin-utils.git"
   }
 }
