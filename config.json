@@ -5,6 +5,8 @@
   "queues": {
     "scan": "scan.wallet",
     "new": "request.wallet",
-    "complete": "complete.wallet"
-  }
+    "complete": "complete.wallet",
+    "send": "send.wallet"
+  },
+  "confirmationsRequired": 60
 }
