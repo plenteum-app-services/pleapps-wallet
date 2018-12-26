@@ -75,10 +75,8 @@ if (cluster.isMaster) {
 
           /* Let's get some basic block information regarding our wallet */
           var topBlock
-          var startBlock
           try {
             topBlock = await request({ url: Config.blockHeaderUrl + 'top', json: true })
-            startBlock = await request({ url: Config.blockHeaderUrl + payload.scanHeight, json: true })
           } catch (e) {
             /* If we can't grab this information, then something went wrong and we need
                to leave this for someone else to handle */
@@ -96,7 +94,7 @@ if (cluster.isMaster) {
           /* Let's go get blockchain transactional data so we can scan through it */
           var syncData
           try {
-            syncData = await request({ url: Config.syncUrl, json: true, method: 'POST', body: { lastKnownBlockHashes: [startBlock.hash], blockCount: (Config.maximumScanBlocks + 1) } })
+            syncData = await request({ url: Config.syncUrl, json: true, method: 'POST', body: { scanHeight: payload.scanHeight, blockCount: (Config.maximumScanBlocks + 1) } })
           } catch (e) {
             /* That didn't work out well, let's just leave this for someone else */
             log(util.format('[ERROR] Worker #%s could not retrieve sync data for wallet [%s]', cluster.worker.id, payload.wallet.address))
@@ -116,20 +114,8 @@ if (cluster.isMaster) {
             for (var j = 0; j < block.transactions.length; j++) {
               var transaction = block.transactions[j]
 
-              /* Reform transaction outputs */
-              var txnOutputs = []
-              for (var k = 0; k < transaction.outputs.length; k++) {
-                var out = transaction.outputs[k]
-                txnOutputs.push({
-                  index: out.outputIndex,
-                  globalIndex: out.globalIndex,
-                  amount: out.amount,
-                  key: out.key
-                })
-              }
-
               /* Check to see if any of the outputs in the transaction belong to us */
-              var outputs = cryptoUtils.scanTransactionOutputs(transaction.publicKey, txnOutputs, payload.wallet.view.privateKey, payload.wallet.spend.publicKey, payload.wallet.spend.privateKey)
+              var outputs = cryptoUtils.scanTransactionOutputs(transaction.publicKey, transaction.outputs, payload.wallet.view.privateKey, payload.wallet.spend.publicKey, payload.wallet.spend.privateKey)
 
               /* If we found outputs, we need to store the top block height we found
                  the funds in so we know where to start our confirmation check from */
