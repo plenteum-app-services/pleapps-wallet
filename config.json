@@ -2,11 +2,14 @@
   "maximumScanBlocks": 60,
   "blockHeaderUrl": "https://blockapi.turtlepay.io/block/header/",
   "syncUrl": "https://blockapi.turtlepay.io/sync",
+  "randomOutputsUrl": "https://blockapi.turtlepay.io/randomOutputs",
   "queues": {
     "scan": "scan.wallet",
     "new": "request.wallet",
     "complete": "complete.wallet",
     "send": "send.wallet"
   },
-  "confirmationsRequired": 60
+  "confirmationsRequired": 2,
+  "defaultNetworkFee": 10,
+  "defaultMixinCount": 3
 }
