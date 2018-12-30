@@ -173,8 +173,12 @@ if (cluster.isMaster) {
               /* We found all the funds we need, but we don't have enough confirmations yet */
               log(util.format('[INFO] Worker #%s found %s for [%s] but is awaiting confirmations. %s blocks to go', cluster.worker.id, totalAmount, payload.wallet.address, (confirmationsRequired - (topBlock.height - fundsFoundInBlock))))
 
-              /* Let Rabbit know that this request needs to be handled again */
-              return privateChannel.nack(message)
+              /* We need to wait a little bit before we signal back that this request
+                 needs handled again to avoid log spam and conserve bandwidth */
+              return setTimeout(() => {
+                /* Let Rabbit know that this request needs to be handled again */
+                return privateChannel.nack(message)
+              }, 5000)
             } else if (topBlock.height > payload.maxHeight && (topBlock.height - fundsFoundInBlock) >= confirmationsRequired) {
               /* We found founds but it's not at least the amount that we requested
                  unfortunately, we've also ran out of time to look for more */
@@ -207,7 +211,12 @@ if (cluster.isMaster) {
               /* We found some funds, it's not what we're looking for but we still have time
                  to keep looking for more */
               log(util.format('[INFO] Worker #%s found %s for [%s] but we need to look for more', cluster.worker.id, totalAmount, payload.wallet.address))
-              return privateChannel.nack(message)
+              /* We need to wait a little bit before we signal back that this request
+                 needs handled again to avoid log spam and conserve bandwidth */
+              return setTimeout(() => {
+                /* Let Rabbit know that this request needs to be handled again */
+                return privateChannel.nack(message)
+              }, 5000)
             }
           }
 
@@ -236,7 +245,12 @@ if (cluster.isMaster) {
           /* If our request has not been timed out (cancelled) and
              we didn't find our funds yet, then let's throw it
              back in the queue for checking again later */
-          return privateChannel.nack(message)
+          /* We need to wait a little bit before we signal back that this request
+             needs handled again to avoid log spam and conserve bandwidth */
+          return setTimeout(() => {
+            /* Let Rabbit know that this request needs to be handled again */
+            return privateChannel.nack(message)
+          }, 5000)
         }
       })
     } catch (e) {
