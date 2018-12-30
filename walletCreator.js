@@ -11,7 +11,7 @@ const RabbitMQ = require('amqplib')
 const cluster = require('cluster')
 const util = require('util')
 const cryptoUtils = new TurtleCoinUtils()
-const cpuCount = require('os').cpus().length
+const cpuCount = Math.ceil(require('os').cpus().length / 3)
 const topBlockUrl = Config.blockHeaderUrl + 'top'
 
 const publicRabbitHost = process.env.RABBIT_PUBLIC_SERVER || 'localhost'
