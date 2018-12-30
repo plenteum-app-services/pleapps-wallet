@@ -26,6 +26,7 @@
     "amqplib": "^0.5.3",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
-    "turtlecoin-utils": "git+https://github.com/turtlecoin/turtlecoin-utils.git"
+    "turtlecoin-utils": "git+https://github.com/turtlecoin/turtlecoin-utils.git",
+    "uuid": "^3.3.2"
   }
 }
