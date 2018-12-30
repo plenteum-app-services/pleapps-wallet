@@ -142,7 +142,7 @@ if (cluster.isMaster) {
                  to let them know that funds were received (still incomplete) */
               var goodResponse = {
                 address: payload.wallet.address,
-                status: 100,
+                status: 100, // Continue
                 request: payload.request
               }
 
@@ -176,7 +176,7 @@ if (cluster.isMaster) {
                  request has been timed out */
               var partialResponse = {
                 address: payload.wallet.address,
-                status: 206,
+                status: 206, // Partial Content (aka Partial Payment)
                 request: payload.request
               }
 
@@ -209,7 +209,7 @@ if (cluster.isMaster) {
           if (topBlock.height > payload.maxHeight && walletOutputs.length === 0) {
             var response = {
               address: payload.wallet.address,
-              status: 408, // request timed out
+              status: 408, // Request Timed Out
               request: payload.request
             }
 
