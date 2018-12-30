@@ -10,7 +10,8 @@
     "send": "send.wallet",
     "relayAgent": "send.transaction"
   },
-  "confirmationsRequired": 2,
+  "defaultConfirmations": 60,
+  "maximumConfirmations": 120,
   "defaultNetworkFee": 10,
   "defaultMixinCount": 3
 }

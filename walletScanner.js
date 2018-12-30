@@ -72,6 +72,14 @@ if (cluster.isMaster) {
       privateChannel.consume(Config.queues.scan, async function (message) {
         if (message !== null) {
           var payload = JSON.parse(message.content.toString())
+          var confirmationsRequired = payload.request.confirmations || Config.defaultConfirmations
+
+          /* If someone somehow manages to send us through a request
+             with a very long number of confirmations we could end
+             up with a job stuck in our queue forever */
+          if (confirmationsRequired > Config.maximumConfirmations) {
+            confirmationsRequired = Config.maximumConfirmations
+          }
 
           /* Let's get some basic block information regarding our wallet */
           var topBlock
@@ -134,7 +142,7 @@ if (cluster.isMaster) {
           /* Did we find some outputs for us? */
           if (walletOutputs.length > 0) {
             /* Did we find all the funds we requested and do we have the required confirmations? */
-            if (totalAmount >= payload.request.amount && (topBlock.height - fundsFoundInBlock) >= Config.confirmationsRequired) {
+            if (totalAmount >= payload.request.amount && (topBlock.height - fundsFoundInBlock) >= confirmationsRequired) {
               /* Congrats, we found all the funds that we requested and we're ready
                  to send them on */
 
@@ -163,11 +171,11 @@ if (cluster.isMaster) {
               return privateChannel.ack(message)
             } else if (totalAmount >= payload.request.amount) {
               /* We found all the funds we need, but we don't have enough confirmations yet */
-              log(util.format('[INFO] Worker #%s found %s for [%s] but is awaiting confirmations. %s blocks to go', cluster.worker.id, totalAmount, payload.wallet.address, (Config.confirmationsRequired - (topBlock.height - fundsFoundInBlock))))
+              log(util.format('[INFO] Worker #%s found %s for [%s] but is awaiting confirmations. %s blocks to go', cluster.worker.id, totalAmount, payload.wallet.address, (confirmationsRequired - (topBlock.height - fundsFoundInBlock))))
 
               /* Let Rabbit know that this request needs to be handled again */
               return privateChannel.nack(message)
-            } else if (topBlock.height > payload.maxHeight && (topBlock.height - fundsFoundInBlock) >= Config.confirmationsRequired) {
+            } else if (topBlock.height > payload.maxHeight && (topBlock.height - fundsFoundInBlock) >= confirmationsRequired) {
               /* We found founds but it's not at least the amount that we requested
                  unfortunately, we've also ran out of time to look for more */
 
