@@ -215,7 +215,7 @@ if (cluster.isMaster) {
                 clearTimeout(cancelTimer)
               }
 
-              if (workerResponse.status === 'ok') {
+              if (workerResponse.status && workerResponse.status.toUpperCase() === 'OK') {
                 var response = {
                   address: payload.wallet.address,
                   transactionHash: tx.hash,
