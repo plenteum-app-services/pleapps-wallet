@@ -5,6 +5,10 @@
 'use strict'
 
 const childProcess = require('child_process')
+const startCreator = (process.argv.length >= 3 && process.argv[2].toLowerCase() === 'creator')
+const startScanner = (process.argv.length >= 3 && process.argv[2].toLowerCase() === 'scanner')
+const startSender = (process.argv.length >= 3 && process.argv[2].toLowerCase() === 'sender')
+const startAll = (!startCreator && !startScanner && !startSender)
 
 /* Copy these into environment variables so that we
    can pass them to our child workers */
@@ -35,10 +39,10 @@ const spawn = function (name, script) {
 console.log('Starting TurtlePay wallet workers...')
 
 /* Spawn the wallet creator */
-spawn('CREATOR', 'walletCreator.js')
+if (startCreator || startAll) { spawn('CREATOR', 'walletCreator.js') }
 
 /* Spawn the wallet scanner */
-spawn('SCANNER', 'walletScanner.js')
+if (startScanner || startAll) { spawn('SCANNER', 'walletScanner.js') }
 
 /* Spawn the wallet sender */
-spawn('SENDER ', 'walletSender.js')
+if (startSender || startAll) { spawn('SENDER ', 'walletSender.js') }
