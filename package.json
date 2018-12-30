@@ -4,7 +4,11 @@
   "description": "TurtlePay: TurtleCoin Wallet Service (TWS)",
   "main": "index.js",
   "scripts": {
-    "test": "standard"
+    "test": "standard",
+    "start": "node index.js",
+    "creator": "node index.js creator",
+    "scanner": "node index.js scanner",
+    "sender": "node index.js sender"
   },
   "repository": {
     "type": "git",
