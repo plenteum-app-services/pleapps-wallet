@@ -74,6 +74,8 @@ if (cluster.isMaster) {
         durable: true
       })
 
+      privateChannel.prefetch(1)
+
       /* Create our worker's reply queue */
       const replyQueue = await publicChannel.assertQueue('', { exclusive: true, durable: false })
 

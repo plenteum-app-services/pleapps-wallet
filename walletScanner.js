@@ -69,6 +69,8 @@ if (cluster.isMaster) {
         durable: true
       })
 
+      privateChannel.prefetch(1)
+
       privateChannel.consume(Config.queues.scan, async function (message) {
         if (message !== null) {
           var payload = JSON.parse(message.content.toString())

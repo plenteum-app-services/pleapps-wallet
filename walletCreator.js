@@ -68,6 +68,8 @@ if (cluster.isMaster) {
         durable: true
       })
 
+      incomingChannel.prefetch(1)
+
       /* Let's get any new wallet requests from the public facing API */
       incomingChannel.consume(Config.queues.new, (message) => {
         /* Is the message real? */
