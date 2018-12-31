@@ -9,6 +9,7 @@ const startCreator = (process.argv.length >= 3 && process.argv[2].toLowerCase() 
 const startScanner = (process.argv.length >= 3 && process.argv[2].toLowerCase() === 'scanner')
 const startSender = (process.argv.length >= 3 && process.argv[2].toLowerCase() === 'sender')
 const startAll = (!startCreator && !startScanner && !startSender)
+var currentColor = 31
 
 /* Copy these into environment variables so that we
    can pass them to our child workers */
@@ -21,18 +22,23 @@ const env = {
   RABBIT_PRIVATE_PASSWORD: process.env.RABBIT_PRIVATE_PASSWORD || ''
 }
 
-const spawn = function (name, script) {
+const spawn = function (name, script, color) {
+  if (!color) {
+    color = currentColor
+    currentColor++
+  }
+  const labelColor = `\x1b[${color}m`
   var child = childProcess.spawn('node', [ script ], {
     cwd: process.cwd(),
     env: env
   })
   child.stdout.on('data', (data) => {
     data.toString().trim().split(/\r?\n/).forEach((message) => {
-      console.log('[%s] %s', name, message.trim())
+      console.log('%s[%s] %s', labelColor, name, message.trim())
     })
   })
   child.on('exit', () => {
-    spawn(name, script)
+    spawn(name, script, color)
   })
 }
 
