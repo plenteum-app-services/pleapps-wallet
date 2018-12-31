@@ -72,7 +72,7 @@ if (cluster.isMaster) {
       privateChannel.consume(Config.queues.scan, async function (message) {
         if (message !== null) {
           var payload = JSON.parse(message.content.toString())
-          var confirmationsRequired = payload.request.confirmations || Config.defaultConfirmations
+          var confirmationsRequired = (typeof payload.request.confirmations !== 'undefined') ? payload.request.confirmations : Config.defaultConfirmations
 
           /* If someone somehow manages to send us through a request
              with a very long number of confirmations we could end
