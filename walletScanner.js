@@ -153,6 +153,7 @@ if (cluster.isMaster) {
                  to let them know that funds were received (still incomplete) */
               var goodResponse = {
                 address: payload.wallet.address,
+                amount: totalAmount,
                 status: 100, // Continue
                 request: payload.request
               }
@@ -175,6 +176,24 @@ if (cluster.isMaster) {
             } else if (totalAmount >= payload.request.amount) {
               /* We found all the funds we need, but we don't have enough confirmations yet */
               log(util.format('[INFO] Worker #%s found %s for [%s] but is awaiting confirmations. %s blocks to go', cluster.worker.id, totalAmount, payload.wallet.address, (confirmationsRequired - (topBlock.height - fundsFoundInBlock))))
+
+              var confirmationsRemaining = confirmationsRequired - (topBlock.height - fundsFoundInBlock)
+              if (confirmationsRemaining < 0) {
+                confirmationsRemaining = 0
+              }
+
+              /* We need to let everyone know that we found their monies but we need more confirmations */
+              var waitingForConfirmations = {
+                address: payload.wallet.address,
+                amount: totalAmount,
+                confirmationsRemaining: confirmationsRemaining,
+                status: 102,
+                request: payload.request
+              }
+
+              publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(waitingForConfirmations)), {
+                persistent: true
+              })
 
               /* We need to wait a little bit before we signal back that this request
                  needs handled again to avoid log spam and conserve bandwidth */
@@ -214,6 +233,25 @@ if (cluster.isMaster) {
               /* We found some funds, it's not what we're looking for but we still have time
                  to keep looking for more */
               log(util.format('[INFO] Worker #%s found %s for [%s] but we need to look for more', cluster.worker.id, totalAmount, payload.wallet.address))
+
+              var blocksRemaining = (payload.maxHeight - topBlock.height)
+              if (blocksRemaining < 0) {
+                blocksRemaining = 0
+              }
+
+              /* We need to let everyone know that we found some monies but we need more */
+              var waitingForConfirmationsNotEnough = {
+                address: payload.wallet.address,
+                amount: totalAmount,
+                blocksRemaining: blocksRemaining,
+                status: 102,
+                request: payload.request
+              }
+
+              publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(waitingForConfirmationsNotEnough)), {
+                persistent: true
+              })
+
               /* We need to wait a little bit before we signal back that this request
                  needs handled again to avoid log spam and conserve bandwidth */
               return setTimeout(() => {
