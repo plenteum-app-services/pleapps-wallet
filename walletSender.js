@@ -221,6 +221,7 @@ if (cluster.isMaster) {
               if (workerResponse.status && workerResponse.status.toUpperCase() === 'OK') {
                 var response = {
                   address: payload.wallet.address,
+                  amount: totalToSend,
                   transactionHash: tx.hash,
                   status: 200, // OK
                   request: payload.request
