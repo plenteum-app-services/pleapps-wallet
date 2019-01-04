@@ -99,7 +99,12 @@ if (cluster.isMaster) {
              created, then there's 0% chance that our transaction has
              occurred */
           if (topBlock.height === payload.scanHeight) {
-            return privateChannel.nack(message)
+            /* We need to wait a little bit before we signal back that this request
+               needs handled again to avoid log spam and conserve bandwidth */
+            return setTimeout(() => {
+              /* Let Rabbit know that this request needs to be handled again */
+              return privateChannel.nack(message)
+            }, 5000)
           }
 
           /* Let's go get blockchain transactional data so we can scan through it */
