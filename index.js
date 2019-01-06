@@ -19,7 +19,8 @@ const env = {
   RABBIT_PUBLIC_PASSWORD: process.env.RABBIT_PUBLIC_PASSWORD || '',
   RABBIT_PRIVATE_SERVER: process.env.RABBIT_PRIVATE_SERVER || 'localhost',
   RABBIT_PRIVATE_USERNAME: process.env.RABBIT_PRIVATE_USERNAME || '',
-  RABBIT_PRIVATE_PASSWORD: process.env.RABBIT_PRIVATE_PASSWORD || ''
+  RABBIT_PRIVATE_PASSWORD: process.env.RABBIT_PRIVATE_PASSWORD || '',
+  RABBIT_PRIVATE_ENCRYPTION_KEY: process.env.RABBIT_PRIVATE_ENCRYPTION_KEY || ''
 }
 
 const spawn = function (name, script, color) {

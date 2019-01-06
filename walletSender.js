@@ -10,9 +10,10 @@ const request = require('request-promise-native')
 const RabbitMQ = require('amqplib')
 const cluster = require('cluster')
 const util = require('util')
+const AES = require('./lib/aes.js')
 const UUID = require('uuid/v4')
 const cryptoUtils = new TurtleCoinUtils()
-const cpuCount = Math.ceil(require('os').cpus().length / 3)
+const cpuCount = Math.ceil(require('os').cpus().length / 8)
 
 const publicRabbitHost = process.env.RABBIT_PUBLIC_SERVER || 'localhost'
 const publicRabbitUsername = process.env.RABBIT_PUBLIC_USERNAME || ''
@@ -21,6 +22,7 @@ const publicRabbitPassword = process.env.RABBIT_PUBLIC_PASSWORD || ''
 const privateRabbitHost = process.env.RABBIT_PRIVATE_SERVER || 'localhost'
 const privateRabbitUsername = process.env.RABBIT_PRIVATE_USERNAME || ''
 const privateRabbitPassword = process.env.RABBIT_PRIVATE_PASSWORD || ''
+const privateRabbitEncryptionKey = process.env.RABBIT_PRIVATE_ENCRYPTION_KEY || ''
 
 function log (message) {
   console.log(util.format('%s: %s', (new Date()).toUTCString(), message))
@@ -57,6 +59,8 @@ if (cluster.isMaster) {
 } else if (cluster.isWorker) {
   (async function () {
     try {
+      const crypto = new AES({ password: privateRabbitEncryptionKey })
+      
       /* Set up our access to the necessary RabbitMQ systems */
       var publicRabbit = await RabbitMQ.connect(buildConnectionString(publicRabbitHost, publicRabbitUsername, publicRabbitPassword))
       var publicChannel = await publicRabbit.createChannel()
@@ -83,6 +87,12 @@ if (cluster.isMaster) {
       privateChannel.consume(Config.queues.send, async function (message) {
         if (message !== null) {
           var payload = JSON.parse(message.content.toString())
+
+          /* If the payload is encrypted, we need to decrypt it */
+          if (payload.encrypted) {
+            payload = crypto.decrypt(payload.encrypted)
+          }
+
           var cancelTimer
 
           /* Sort our outputs from smallest to largest */

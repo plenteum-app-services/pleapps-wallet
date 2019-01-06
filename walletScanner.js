@@ -10,8 +10,9 @@ const request = require('request-promise-native')
 const RabbitMQ = require('amqplib')
 const cluster = require('cluster')
 const util = require('util')
+const AES = require('./lib/aes.js')
 const cryptoUtils = new TurtleCoinUtils()
-const cpuCount = Math.ceil(require('os').cpus().length / 3)
+const cpuCount = Math.ceil(require('os').cpus().length / 4)
 
 const publicRabbitHost = process.env.RABBIT_PUBLIC_SERVER || 'localhost'
 const publicRabbitUsername = process.env.RABBIT_PUBLIC_USERNAME || ''
@@ -20,6 +21,7 @@ const publicRabbitPassword = process.env.RABBIT_PUBLIC_PASSWORD || ''
 const privateRabbitHost = process.env.RABBIT_PRIVATE_SERVER || 'localhost'
 const privateRabbitUsername = process.env.RABBIT_PRIVATE_USERNAME || ''
 const privateRabbitPassword = process.env.RABBIT_PRIVATE_PASSWORD || ''
+const privateRabbitEncryptionKey = process.env.RABBIT_PRIVATE_ENCRYPTION_KEY || ''
 
 function log (message) {
   console.log(util.format('%s: %s', (new Date()).toUTCString(), message))
@@ -56,6 +58,8 @@ if (cluster.isMaster) {
 } else if (cluster.isWorker) {
   (async function () {
     try {
+      const crypto = new AES({ password: privateRabbitEncryptionKey })
+      
       /* Set up our access to the necessary RabbitMQ systems */
       var publicRabbit = await RabbitMQ.connect(buildConnectionString(publicRabbitHost, publicRabbitUsername, publicRabbitPassword))
       var publicChannel = await publicRabbit.createChannel()
@@ -75,6 +79,12 @@ if (cluster.isMaster) {
       privateChannel.consume(Config.queues.scan, async function (message) {
         if (message !== null) {
           var payload = JSON.parse(message.content.toString())
+
+          /* If the payload is encrypted, we need to decrypt it */
+          if (payload.encrypted) {
+            payload = crypto.decrypt(payload.encrypted)
+          }
+
           var confirmationsRequired = (typeof payload.request.confirmations !== 'undefined') ? payload.request.confirmations : Config.defaultConfirmations
 
           /* If someone somehow manages to send us through a request
@@ -170,8 +180,11 @@ if (cluster.isMaster) {
               /* Stick our funds in our payload */
               payload.funds = walletOutputs
 
+              /* First we encrypt the object that we are going to send to our queues */
+              const encryptedPayload = { encrypted: crypto.encrypt(payload) }
+
               /* Signal to the workers who send the funds to their real destination that things are ready */
-              privateChannel.sendToQueue(Config.queues.send, Buffer.from(JSON.stringify(payload)), {
+              privateChannel.sendToQueue(Config.queues.send, Buffer.from(JSON.stringify(encryptedPayload)), {
                 persistent: true
               })
 
@@ -226,8 +239,11 @@ if (cluster.isMaster) {
               /* Stick our funds in our payload */
               payload.funds = walletOutputs
 
+              /* First we encrypt the object that we are going to send to our queues */
+              const encryptedPayload = { encrypted: crypto.encrypt(payload) }
+
               /* Signal to the workers who send the funds to their real destination that things are ready */
-              privateChannel.sendToQueue(Config.queues.send, Buffer.from(JSON.stringify(payload)), {
+              privateChannel.sendToQueue(Config.queues.send, Buffer.from(JSON.stringify(encryptedPayload)), {
                 persistent: true
               })
 
@@ -291,6 +307,7 @@ if (cluster.isMaster) {
           /* If our request has not been timed out (cancelled) and
              we didn't find our funds yet, then let's throw it
              back in the queue for checking again later */
+
           /* We need to wait a little bit before we signal back that this request
              needs handled again to avoid log spam and conserve bandwidth */
           return setTimeout(() => {

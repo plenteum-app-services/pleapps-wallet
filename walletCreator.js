@@ -10,8 +10,9 @@ const request = require('request-promise-native')
 const RabbitMQ = require('amqplib')
 const cluster = require('cluster')
 const util = require('util')
+const AES = require('./lib/aes.js')
 const cryptoUtils = new TurtleCoinUtils()
-const cpuCount = Math.ceil(require('os').cpus().length / 3)
+const cpuCount = Math.ceil(require('os').cpus().length / 8)
 const topBlockUrl = Config.blockHeaderUrl + 'top'
 
 const publicRabbitHost = process.env.RABBIT_PUBLIC_SERVER || 'localhost'
@@ -21,6 +22,7 @@ const publicRabbitPassword = process.env.RABBIT_PUBLIC_PASSWORD || ''
 const privateRabbitHost = process.env.RABBIT_PRIVATE_SERVER || 'localhost'
 const privateRabbitUsername = process.env.RABBIT_PRIVATE_USERNAME || ''
 const privateRabbitPassword = process.env.RABBIT_PRIVATE_PASSWORD || ''
+const privateRabbitEncryptionKey = process.env.RABBIT_PRIVATE_ENCRYPTION_KEY || ''
 
 function log (message) {
   console.log(util.format('%s: %s', (new Date()).toUTCString(), message))
@@ -57,6 +59,8 @@ if (cluster.isMaster) {
 } else if (cluster.isWorker) {
   (async function () {
     try {
+      const crypto = new AES({ password: privateRabbitEncryptionKey })
+      
       /* Set up our access to the necessary RabbitMQ systems */
       var incoming = await RabbitMQ.connect(buildConnectionString(publicRabbitHost, publicRabbitUsername, publicRabbitPassword))
       var incomingChannel = await incoming.createChannel()
@@ -101,15 +105,18 @@ if (cluster.isMaster) {
             /* Construct our payload for sending via the private RabbitMQ server
                to the workers that are actually scanning the wallets for incoming
                funds */
-            const scanRequest = {
+            const scanPayload = {
               wallet: newAddress,
               scanHeight: topBlock.height,
               maxHeight: (topBlock.height + Config.maximumScanBlocks),
               request: JSON.parse(message.content.toString())
             }
 
+            /* First, we encrypt the object that we are going to send to our queues */
+            const encryptedPayload = { encrypted: crypto.encrypt(scanPayload) }
+
             /* Go ahead and send that message to the scanning queue */
-            outgoingChannel.sendToQueue(Config.queues.scan, Buffer.from(JSON.stringify(scanRequest)), { persistent: true })
+            outgoingChannel.sendToQueue(Config.queues.scan, Buffer.from(JSON.stringify(encryptedPayload)), { persistent: true })
 
             /* Acknowledge that we've handled this new wallet request */
             incomingChannel.ack(message)
