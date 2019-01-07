@@ -60,7 +60,7 @@ if (cluster.isMaster) {
   (async function () {
     try {
       const crypto = new AES({ password: privateRabbitEncryptionKey })
-      
+
       /* Set up our access to the necessary RabbitMQ systems */
       var incoming = await RabbitMQ.connect(buildConnectionString(publicRabbitHost, publicRabbitUsername, publicRabbitPassword))
       var incomingChannel = await incoming.createChannel()
