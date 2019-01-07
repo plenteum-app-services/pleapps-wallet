@@ -12,6 +12,9 @@ const cluster = require('cluster')
 const util = require('util')
 const AES = require('./lib/aes.js')
 const UUID = require('uuid/v4')
+const MessageSigner = require('./lib/messageSigner.js')
+const signer = new MessageSigner()
+
 const cryptoUtils = new TurtleCoinUtils()
 const cpuCount = Math.ceil(require('os').cpus().length / 8)
 
@@ -120,6 +123,9 @@ if (cluster.isMaster) {
               request: payload.request
             }
 
+            /* Sign the message */
+            goodResponse.signature = await signer.sign(goodResponse, payload.privateKey)
+
             publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(goodResponse)), {
               persistent: true
             })
@@ -215,7 +221,7 @@ if (cluster.isMaster) {
 
           /* Here, we set up our worker side of the queue to grab the replyQueue
              from the relay agent workers so we can spit the results back to the client */
-          publicChannel.consume(replyQueue.queue, (replyMessage) => {
+          publicChannel.consume(replyQueue.queue, async function (replyMessage) {
             /* If we received a valid message and it matches our request we're good to go */
             if (replyMessage !== null && replyMessage.properties.correlationId === requestId) {
               var workerResponse = JSON.parse(replyMessage.content.toString())
@@ -236,6 +242,9 @@ if (cluster.isMaster) {
                   status: 200, // OK
                   request: payload.request
                 }
+
+                /* Sign the message */
+                response.signature = await signer.sign(response, payload.privateKey)
 
                 /* Send the 'completed' request information back
                    to the public processors so we can let the requestor

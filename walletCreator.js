@@ -11,6 +11,9 @@ const RabbitMQ = require('amqplib')
 const cluster = require('cluster')
 const util = require('util')
 const AES = require('./lib/aes.js')
+const MessageSigner = require('./lib/messageSigner.js')
+const signer = new MessageSigner()
+
 const cryptoUtils = new TurtleCoinUtils()
 const cpuCount = Math.ceil(require('os').cpus().length / 8)
 const topBlockUrl = Config.blockHeaderUrl + 'top'
@@ -86,15 +89,19 @@ if (cluster.isMaster) {
           request({
             url: topBlockUrl,
             json: true
-          }).then((topBlock) => {
+          }).then(async function (topBlock) {
             /* Now that we know what our scan height is, we can get moving */
             log(util.format('Worker #%s: Created new wallet %s at height %s for %s', cluster.worker.id, newAddress.address, topBlock.height, message.properties.correlationId))
+
+            /* Get a random set of keys for message signing */
+            const keys = await signer.generateKeys()
 
             /* Construct our response back to the public API -- non-sensitive information */
             const response = {
               address: newAddress.address,
               scanHeight: topBlock.height,
-              maxHeight: (topBlock.height + Config.maximumScanBlocks)
+              maxHeight: (topBlock.height + Config.maximumScanBlocks),
+              publicKey: keys.publicKey
             }
 
             /* Go ahead and fire that information back to the public API for the related request */
@@ -109,7 +116,8 @@ if (cluster.isMaster) {
               wallet: newAddress,
               scanHeight: topBlock.height,
               maxHeight: (topBlock.height + Config.maximumScanBlocks),
-              request: JSON.parse(message.content.toString())
+              request: JSON.parse(message.content.toString()),
+              privateKey: keys.privateKey
             }
 
             /* First, we encrypt the object that we are going to send to our queues */

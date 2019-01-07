@@ -11,6 +11,9 @@ const RabbitMQ = require('amqplib')
 const cluster = require('cluster')
 const util = require('util')
 const AES = require('./lib/aes.js')
+const MessageSigner = require('./lib/messageSigner.js')
+const signer = new MessageSigner()
+
 const cryptoUtils = new TurtleCoinUtils()
 const cpuCount = Math.ceil(require('os').cpus().length / 4)
 
@@ -173,6 +176,9 @@ if (cluster.isMaster) {
                 request: payload.request
               }
 
+              /* Sign the message */
+              goodResponse.signature = await signer.sign(goodResponse, payload.privateKey)
+
               publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(goodResponse)), {
                 persistent: true
               })
@@ -209,6 +215,9 @@ if (cluster.isMaster) {
                 request: payload.request
               }
 
+              /* Sign the message */
+              waitingForConfirmations.signature = await signer.sign(waitingForConfirmations, payload.privateKey)
+
               publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(waitingForConfirmations)), {
                 persistent: true
               })
@@ -231,6 +240,9 @@ if (cluster.isMaster) {
                 status: 206, // Partial Content (aka Partial Payment)
                 request: payload.request
               }
+
+              /* Sign the message */
+              partialResponse.signature = await signer.sign(partialResponse, payload.privateKey)
 
               publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(partialResponse)), {
                 persistent: true
@@ -269,6 +281,9 @@ if (cluster.isMaster) {
                 request: payload.request
               }
 
+              /* Sign the message */
+              waitingForConfirmationsNotEnough.signature = await signer.sign(waitingForConfirmationsNotEnough, payload.privateKey)
+
               publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(waitingForConfirmationsNotEnough)), {
                 persistent: true
               })
@@ -291,6 +306,9 @@ if (cluster.isMaster) {
               status: 408, // Request Timed Out
               request: payload.request
             }
+
+            /* Sign the message */
+            response.signature = await signer.sign(response, payload.privateKey)
 
             /* Send the 'cancelled' wallet back to the public
                workers that will signal to the caller that the
