@@ -11,8 +11,6 @@ const RabbitMQ = require('amqplib')
 const cluster = require('cluster')
 const util = require('util')
 const AES = require('./lib/aes.js')
-const MessageSigner = require('./lib/messageSigner.js')
-const signer = new MessageSigner()
 
 const cryptoUtils = new TurtleCoinUtils()
 const cpuCount = Math.ceil(require('os').cpus().length / 4)
@@ -173,11 +171,9 @@ if (cluster.isMaster) {
                 address: payload.wallet.address,
                 amount: totalAmount,
                 status: 100, // Continue
-                request: payload.request
+                request: payload.request,
+                privateKey: payload.privateKey
               }
-
-              /* Sign the message */
-              goodResponse.signature = await signer.sign(goodResponse, payload.privateKey)
 
               publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(goodResponse)), {
                 persistent: true
@@ -212,11 +208,9 @@ if (cluster.isMaster) {
                 amount: totalAmount,
                 confirmationsRemaining: confirmationsRemaining,
                 status: 102,
-                request: payload.request
+                request: payload.request,
+                privateKey: payload.privateKey
               }
-
-              /* Sign the message */
-              waitingForConfirmations.signature = await signer.sign(waitingForConfirmations, payload.privateKey)
 
               publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(waitingForConfirmations)), {
                 persistent: true
@@ -238,11 +232,9 @@ if (cluster.isMaster) {
               var partialResponse = {
                 address: payload.wallet.address,
                 status: 206, // Partial Content (aka Partial Payment)
-                request: payload.request
+                request: payload.request,
+                privateKey: payload.privateKey
               }
-
-              /* Sign the message */
-              partialResponse.signature = await signer.sign(partialResponse, payload.privateKey)
 
               publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(partialResponse)), {
                 persistent: true
@@ -278,11 +270,9 @@ if (cluster.isMaster) {
                 amount: totalAmount,
                 blocksRemaining: blocksRemaining,
                 status: 102,
-                request: payload.request
+                request: payload.request,
+                privateKey: payload.privateKey
               }
-
-              /* Sign the message */
-              waitingForConfirmationsNotEnough.signature = await signer.sign(waitingForConfirmationsNotEnough, payload.privateKey)
 
               publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(waitingForConfirmationsNotEnough)), {
                 persistent: true
@@ -304,11 +294,9 @@ if (cluster.isMaster) {
             var response = {
               address: payload.wallet.address,
               status: 408, // Request Timed Out
-              request: payload.request
+              request: payload.request,
+              privateKey: payload.privateKey
             }
-
-            /* Sign the message */
-            response.signature = await signer.sign(response, payload.privateKey)
 
             /* Send the 'cancelled' wallet back to the public
                workers that will signal to the caller that the

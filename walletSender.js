@@ -12,8 +12,6 @@ const cluster = require('cluster')
 const util = require('util')
 const AES = require('./lib/aes.js')
 const UUID = require('uuid/v4')
-const MessageSigner = require('./lib/messageSigner.js')
-const signer = new MessageSigner()
 
 const cryptoUtils = new TurtleCoinUtils()
 const cpuCount = Math.ceil(require('os').cpus().length / 8)
@@ -120,11 +118,9 @@ if (cluster.isMaster) {
             var goodResponse = {
               address: payload.wallet.address,
               status: 402, // Payment required (as in not enough to send anything on
-              request: payload.request
+              request: payload.request,
+              privateKey: payload.privateKey
             }
-
-            /* Sign the message */
-            goodResponse.signature = await signer.sign(goodResponse, payload.privateKey)
 
             publicChannel.sendToQueue(Config.queues.complete, Buffer.from(JSON.stringify(goodResponse)), {
               persistent: true
@@ -240,11 +236,9 @@ if (cluster.isMaster) {
                   amount: totalToSend,
                   transactionHash: tx.hash,
                   status: 200, // OK
-                  request: payload.request
+                  request: payload.request,
+                  privateKey: payload.privateKey
                 }
-
-                /* Sign the message */
-                response.signature = await signer.sign(response, payload.privateKey)
 
                 /* Send the 'completed' request information back
                    to the public processors so we can let the requestor
