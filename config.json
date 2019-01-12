@@ -8,7 +8,7 @@
     "new": "request.wallet",
     "complete": "complete.wallet",
     "send": "send.wallet",
-    "relayAgent": "send.transaction"
+    "relayAgent": "request.network"
   },
   "defaultConfirmations": 60,
   "maximumConfirmations": 120,
