@@ -15,7 +15,7 @@ const MessageSigner = require('./lib/messageSigner.js')
 const signer = new MessageSigner()
 
 const cryptoUtils = new TurtleCoinUtils()
-const cpuCount = Math.ceil(require('os').cpus().length / 8)
+const cpuCount = require('os').cpus().length
 const topBlockUrl = Config.blockHeaderUrl + 'top'
 
 const publicRabbitHost = process.env.RABBIT_PUBLIC_SERVER || 'localhost'

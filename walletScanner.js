@@ -13,7 +13,7 @@ const util = require('util')
 const AES = require('./lib/aes.js')
 
 const cryptoUtils = new TurtleCoinUtils()
-const cpuCount = Math.ceil(require('os').cpus().length / 4)
+const cpuCount = require('os').cpus().length
 
 const publicRabbitHost = process.env.RABBIT_PUBLIC_SERVER || 'localhost'
 const publicRabbitUsername = process.env.RABBIT_PUBLIC_USERNAME || ''
