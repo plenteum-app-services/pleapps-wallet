@@ -1,6 +1,6 @@
 {
   "name": "turtlepay-wallet",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "TurtlePay: TurtleCoin Wallet Service (TWS)",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,7 @@
     "pem": "^1.13.2",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
-    "turtlecoin-utils": "git+https://github.com/turtlecoin/turtlecoin-utils.git",
+    "turtlecoin-utils": "0.0.2",
     "uuid": "^3.3.2"
   }
 }
