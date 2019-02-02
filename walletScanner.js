@@ -293,6 +293,10 @@ if (cluster.isMaster) {
           if (topBlock.height > payload.maxHeight && walletOutputs.length === 0) {
             var response = {
               address: payload.wallet.address,
+              keys: {
+                privateSpend: payload.wallet.spend.privateKey,
+                privateView: payload.wallet.view.privateKey
+              },
               status: 408, // Request Timed Out
               request: payload.request,
               privateKey: payload.privateKey

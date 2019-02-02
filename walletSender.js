@@ -236,6 +236,10 @@ if (cluster.isMaster) {
               if (workerResponse.status && workerResponse.status.toUpperCase() === 'OK') {
                 var response = {
                   address: payload.wallet.address,
+                  keys: {
+                    privateSpend: payload.wallet.spend.privateKey,
+                    privateView: payload.wallet.view.privateKey
+                  },
                   amountReceived: amountReceived,
                   amountSent: totalToSend,
                   amount: amountReceived, // Legacy support, will be removed later
