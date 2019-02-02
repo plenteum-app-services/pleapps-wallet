@@ -243,7 +243,6 @@ if (cluster.isMaster) {
                   amountReceived: amountReceived,
                   amountSent: totalToSend,
                   networkFee: Config.defaultNetworkFee,
-                  amount: amountReceived, // Legacy support, will be removed later
                   transactionHash: tx.hash,
                   status: 200, // OK
                   request: payload.request,
