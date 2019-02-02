@@ -132,6 +132,9 @@ if (cluster.isMaster) {
             return privateChannel.ack(message)
           }
 
+          /* Save off the amount that we actually received */
+          const amountReceived = totalToSend
+
           /* Deduct the network transaction fee */
           totalToSend -= Config.defaultNetworkFee
 
@@ -233,7 +236,9 @@ if (cluster.isMaster) {
               if (workerResponse.status && workerResponse.status.toUpperCase() === 'OK') {
                 var response = {
                   address: payload.wallet.address,
-                  amount: totalToSend,
+                  amountReceived: amountReceived,
+                  amountSent: totalToSend,
+                  amount: amountReceived, // Legacy support, will be removed later
                   transactionHash: tx.hash,
                   status: 200, // OK
                   request: payload.request,
