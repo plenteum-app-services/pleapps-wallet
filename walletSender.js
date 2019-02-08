@@ -244,6 +244,7 @@ if (cluster.isMaster) {
                   amountSent: totalToSend,
                   networkFee: Config.defaultNetworkFee,
                   transactionHash: tx.hash,
+                  transactionPrivateKey: tx.transaction.prvkey,
                   status: 200, // OK
                   request: payload.request,
                   privateKey: payload.privateKey
