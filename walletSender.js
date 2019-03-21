@@ -1,4 +1,4 @@
-// Copyright (c) 2018, TurtlePay Developers
+// Copyright (c) 2018-2019, TurtlePay Developers
 //
 // Please see the included LICENSE file for more information.
 
@@ -66,8 +66,22 @@ if (cluster.isMaster) {
       var publicRabbit = await RabbitMQ.connect(buildConnectionString(publicRabbitHost, publicRabbitUsername, publicRabbitPassword))
       var publicChannel = await publicRabbit.createChannel()
 
+      publicRabbit.on('error', (error) => {
+        throw new Error(error)
+      })
+      publicChannel.on('error', (error) => {
+        throw new Error(error)
+      })
+
       var privateRabbit = await RabbitMQ.connect(buildConnectionString(privateRabbitHost, privateRabbitUsername, privateRabbitPassword))
       var privateChannel = await privateRabbit.createChannel()
+
+      privateRabbit.on('error', (error) => {
+        throw new Error(error)
+      })
+      privateChannel.on('error', (error) => {
+        throw new Error(error)
+      })
 
       /* Set up the RabbitMQ queues */
       await publicChannel.assertQueue(Config.queues.complete, {
