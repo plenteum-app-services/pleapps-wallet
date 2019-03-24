@@ -4,18 +4,18 @@
 
 'use strict'
 
-const Config = require('./config.json')
-const TurtleCoinUtils = require('turtlecoin-utils').CryptoNote
-const request = require('request-promise-native')
-const RabbitMQ = require('amqplib')
-const cluster = require('cluster')
-const util = require('util')
 const AES = require('./lib/aes.js')
+const Config = require('./config.json')
+const cluster = require('cluster')
 const MessageSigner = require('./lib/messageSigner.js')
-const signer = new MessageSigner()
+const TurtleCoinUtils = require('turtlecoin-utils').CryptoNote
+const RabbitMQ = require('amqplib')
+const request = require('request-promise-native')
+const util = require('util')
 
-const cryptoUtils = new TurtleCoinUtils()
 const cpuCount = require('os').cpus().length
+const cryptoUtils = new TurtleCoinUtils()
+const signer = new MessageSigner()
 const topBlockUrl = Config.blockHeaderUrl + 'top'
 
 const publicRabbitHost = process.env.RABBIT_PUBLIC_SERVER || 'localhost'

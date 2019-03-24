@@ -4,16 +4,16 @@
 
 'use strict'
 
-const Config = require('./config.json')
-const TurtleCoinUtils = require('turtlecoin-utils').CryptoNote
-const request = require('request-promise-native')
-const RabbitMQ = require('amqplib')
-const cluster = require('cluster')
-const util = require('util')
 const AES = require('./lib/aes.js')
+const Config = require('./config.json')
+const cluster = require('cluster')
+const RabbitMQ = require('amqplib')
+const request = require('request-promise-native')
+const TurtleCoinUtils = require('turtlecoin-utils').CryptoNote
+const util = require('util')
 
-const cryptoUtils = new TurtleCoinUtils()
 const cpuCount = require('os').cpus().length
+const cryptoUtils = new TurtleCoinUtils()
 
 const publicRabbitHost = process.env.RABBIT_PUBLIC_SERVER || 'localhost'
 const publicRabbitUsername = process.env.RABBIT_PUBLIC_USERNAME || ''
