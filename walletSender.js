@@ -5,7 +5,7 @@
 'use strict'
 
 const Config = require('./config.json')
-const TurtleCoinUtils = require('turtlecoin-utils')
+const TurtleCoinUtils = require('turtlecoin-utils').CryptoNote
 const request = require('request-promise-native')
 const RabbitMQ = require('amqplib')
 const cluster = require('cluster')
@@ -227,7 +227,7 @@ if (cluster.isMaster) {
           }
 
           /* Create the new transaction that will send the funds on */
-          const tx = cryptoUtils.createTransaction(payload.wallet, outputs, payload.funds, randomOutputs, Config.defaultMixinCount, Config.defaultNetworkFee, paymentId)
+          const tx = cryptoUtils.createTransaction(outputs, payload.funds, randomOutputs, Config.defaultMixinCount, Config.defaultNetworkFee, paymentId)
 
           /* Generate a random request ID for use by the relay agent client */
           const requestId = UUID().toString().replace(/-/g, '')

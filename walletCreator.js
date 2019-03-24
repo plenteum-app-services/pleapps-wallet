@@ -5,7 +5,7 @@
 'use strict'
 
 const Config = require('./config.json')
-const TurtleCoinUtils = require('turtlecoin-utils')
+const TurtleCoinUtils = require('turtlecoin-utils').CryptoNote
 const request = require('request-promise-native')
 const RabbitMQ = require('amqplib')
 const cluster = require('cluster')
