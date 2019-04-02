@@ -38,6 +38,9 @@ const spawn = function (name, script, color) {
       console.log('%s[%s] %s', labelColor, name, message.trim())
     })
   })
+  child.on('error', (error) => {
+    console.log('%s[%s] %s', labelColor, name, error.toString())
+  })
   child.on('exit', () => {
     spawn(name, script, color)
   })
