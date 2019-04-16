@@ -124,12 +124,7 @@ if (cluster.isMaster) {
              created, then there's 0% chance that our transaction has
              occurred */
           if (topBlock.height === payload.scanHeight) {
-            /* We need to wait a little bit before we signal back that this request
-               needs handled again to avoid log spam and conserve bandwidth */
-            return setTimeout(() => {
-              /* Let Rabbit know that this request needs to be handled again */
-              return privateChannel.nack(message)
-            }, 5000)
+            return privateChannel.nack(message)
           }
 
           /* Let's go get blockchain transactional data so we can scan through it */
@@ -230,12 +225,7 @@ if (cluster.isMaster) {
                 persistent: true
               })
 
-              /* We need to wait a little bit before we signal back that this request
-                 needs handled again to avoid log spam and conserve bandwidth */
-              return setTimeout(() => {
-                /* Let Rabbit know that this request needs to be handled again */
-                return privateChannel.nack(message)
-              }, 5000)
+              return privateChannel.nack(message)
             } else if (topBlock.height > payload.maxHeight && (topBlock.height - fundsFoundInBlock) >= confirmationsRequired) {
               /* We found founds but it's not at least the amount that we requested
                  unfortunately, we've also ran out of time to look for more */
@@ -292,12 +282,7 @@ if (cluster.isMaster) {
                 persistent: true
               })
 
-              /* We need to wait a little bit before we signal back that this request
-                 needs handled again to avoid log spam and conserve bandwidth */
-              return setTimeout(() => {
-                /* Let Rabbit know that this request needs to be handled again */
-                return privateChannel.nack(message)
-              }, 5000)
+              return privateChannel.nack(message)
             }
           }
 
@@ -332,12 +317,7 @@ if (cluster.isMaster) {
              we didn't find our funds yet, then let's throw it
              back in the queue for checking again later */
 
-          /* We need to wait a little bit before we signal back that this request
-             needs handled again to avoid log spam and conserve bandwidth */
-          return setTimeout(() => {
-            /* Let Rabbit know that this request needs to be handled again */
-            return privateChannel.nack(message)
-          }, 5000)
+          return privateChannel.nack(message)
         }
       })
     } catch (e) {
