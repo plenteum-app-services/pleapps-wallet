@@ -100,6 +100,8 @@ if (cluster.isMaster) {
             payload = crypto.decrypt(payload.encrypted)
           }
 
+          log(util.format('Scanning for transactions to [%s]', payload.wallet.address))
+
           var confirmationsRequired = (typeof payload.request.confirmations !== 'undefined') ? payload.request.confirmations : Config.defaultConfirmations
 
           /* If someone somehow manages to send us through a request
