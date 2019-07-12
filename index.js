@@ -4,6 +4,7 @@
 
 'use strict'
 
+require('dotenv').config()
 const childProcess = require('child_process')
 const startCreator = (process.argv.length >= 3 && process.argv[2].toLowerCase() === 'creator')
 const startScanner = (process.argv.length >= 3 && process.argv[2].toLowerCase() === 'scanner')
