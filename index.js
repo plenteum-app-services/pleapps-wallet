@@ -29,7 +29,7 @@ const spawn = function (name, script, color) {
     currentColor++
   }
   const labelColor = `\x1b[${color}m`
-  var child = childProcess.spawn('node', [ script ], {
+  var child = childProcess.spawn('node', [script], {
     cwd: process.cwd(),
     env: env
   })
