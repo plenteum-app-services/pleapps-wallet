@@ -4,6 +4,7 @@
 
 'use strict'
 
+require('dotenv').config()
 const AES = require('./lib/aes.js')
 const Config = require('./config.json')
 const cluster = require('cluster')

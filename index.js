@@ -4,6 +4,7 @@
 
 'use strict'
 
+require('dotenv').config()
 const childProcess = require('child_process')
 const startCreator = (process.argv.length >= 3 && process.argv[2].toLowerCase() === 'creator')
 const startScanner = (process.argv.length >= 3 && process.argv[2].toLowerCase() === 'scanner')
@@ -29,7 +30,7 @@ const spawn = function (name, script, color) {
     currentColor++
   }
   const labelColor = `\x1b[${color}m`
-  var child = childProcess.spawn('node', [ script ], {
+  var child = childProcess.spawn('node', [script], {
     cwd: process.cwd(),
     env: env
   })
