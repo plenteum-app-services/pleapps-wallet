@@ -1,7 +1,7 @@
 {
-  "name": "turtlepay-wallet",
+  "name": "pleapp-wallet",
   "version": "0.0.5",
-  "description": "TurtlePay: TurtleCoin Wallet Service (TWS)",
+  "description": "Plenteum App Services: Plenteum Wallet Service (PWS)",
   "main": "index.js",
   "scripts": {
     "test": "standard",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TurtlePay/turtlepay-wallet.git"
+    "url": "git+https://github.com/plenteum-app-services/pleapps-wallet.git"
   },
   "keywords": [
     "TurtlePay"
@@ -20,9 +20,9 @@
   "author": "TurtlePay Development Team",
   "license": "AGPL-3.0",
   "bugs": {
-    "url": "https://github.com/TurtlePay/turtlepay-wallet/issues"
+    "url": "https://github.com/plenteum-app-services/pleapps/issues"
   },
-  "homepage": "https://github.com/TurtlePay/turtlepay-wallet#readme",
+  "homepage": "https://github.com/plenteum-app-services/pleapps#readme",
   "devDependencies": {
     "standard": "^13.1.0"
   },
@@ -33,7 +33,7 @@
     "pem": "^1.14.2",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
-    "turtlecoin-utils": "^1.0.5",
+    "plenteum-utils": "^1.0.6",
     "uuid": "^3.3.3"
   }
 }

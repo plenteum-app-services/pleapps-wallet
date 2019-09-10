@@ -9,13 +9,13 @@ const AES = require('./lib/aes.js')
 const Config = require('./config.json')
 const cluster = require('cluster')
 const MessageSigner = require('./lib/messageSigner.js')
-const TurtleCoinUtils = require('turtlecoin-utils').CryptoNote
+const PlenteumUtils = require('plenteum-utils').CryptoNote
 const RabbitMQ = require('amqplib')
 const request = require('request-promise-native')
 const util = require('util')
 
 const cpuCount = require('os').cpus().length
-const cryptoUtils = new TurtleCoinUtils()
+const cryptoUtils = new PlenteumUtils()
 const signer = new MessageSigner()
 const topBlockUrl = Config.blockHeaderUrl + 'top'
 

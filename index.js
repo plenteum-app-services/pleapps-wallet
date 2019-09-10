@@ -47,7 +47,7 @@ const spawn = function (name, script, color) {
   })
 }
 
-console.log('Starting TurtlePay wallet workers...')
+console.log('Starting PLE Apps wallet workers...')
 
 /* Spawn the wallet creator */
 if (startCreator || startAll) { spawn('CREATOR', 'walletCreator.js') }

@@ -10,11 +10,11 @@ const Config = require('./config.json')
 const cluster = require('cluster')
 const RabbitMQ = require('amqplib')
 const request = require('request-promise-native')
-const TurtleCoinUtils = require('turtlecoin-utils').CryptoNote
+const PlenteumUtils = require('plenteum-utils').CryptoNote
 const util = require('util')
 
 const cpuCount = require('os').cpus().length
-const cryptoUtils = new TurtleCoinUtils()
+const cryptoUtils = new PlenteumUtils()
 
 const publicRabbitHost = process.env.RABBIT_PUBLIC_SERVER || 'localhost'
 const publicRabbitUsername = process.env.RABBIT_PUBLIC_USERNAME || ''
